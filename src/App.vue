@@ -9,12 +9,15 @@ import "@esri/calcite-components/dist/components/calcite-table-row";
 import "@esri/calcite-components/dist/components/calcite-table-cell";
 
 import { onMounted} from "vue";
-import { storeToRefs } from "pinia";
+
+import { formatDateTimeUnix } from "@/composables/date.js"
+
+import LandDevelopmentList from "./components/LandDevelopmentList.vue";
+import EarthDisturbanceList from "./components/EarthDisturbanceList.vue";
+import CapitalProjectsList from "./components/CapitalProjectsList.vue";
 
 import { useDataStore } from "@/stores/data";
-const dataStore = useDataStore()
 const { fetchCapitalProjects, fetchLandDevelopmentProjects, fetchEarthDisturbanceProjects } = useDataStore();
-const { landDevelopmentProjects, earthDisturbaceProjects, capitalProjects } = storeToRefs(dataStore);
 
 
 onMounted(async () => {
@@ -29,6 +32,11 @@ onMounted(async () => {
   }
 });
 
+
+function generatePDF () {
+  window.print()
+}
+
 </script>
 
 <template>
@@ -36,70 +44,21 @@ onMounted(async () => {
     <calcite-navigation slot="header">
       <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report" description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
-        <calcite-button icon-start="download">Download Report</calcite-button>
+        <calcite-button @click="generatePDF" icon-start="download">Generate Report</calcite-button>
       </div>
+      <calcite-navigation slot="navigation-secondary">
+        <p slot="content-center"><i>As of {{ formatDateTimeUnix(Date.now()) }}</i></p>
+      </calcite-navigation>
     </calcite-navigation>
     <div id="reportWrapper">
       <h2>Land Development Projects</h2>
-      <ol>
-        <li v-for="project in landDevelopmentProjects">
-          <p class="projectTitle"><span>{{ project.attributes.project_name }} </span> | {{ project.attributes.project_address }}</p>
-          <calcite-table striped="" scale="s" layout="fixed">
-            <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>JEA#:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number }}</calcite-table-cell>
-            </calcite-table-row>
-            <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>Submitted:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number }}</calcite-table-cell>
-            </calcite-table-row>
-            <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>PC Approval:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number }}</calcite-table-cell>
-            </calcite-table-row>
-            <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>BOS Approval:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number }}</calcite-table-cell>
-            </calcite-table-row>
-            <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>Start of Construction:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number }}</calcite-table-cell>
-            </calcite-table-row>
-          </calcite-table>
-          <p class="projectNarrative">
-            <span>Narrative:</span>
-            <br>
-            {{ project.attributes.project_narrative }}
-          </p>
-          <p class="projectNarrative">
-            <span>Updates:</span>
-            <br>
-            {{ project.attributes.public_project_updates }}
-          </p>
-        </li>
-      </ol>
-      <!-- <h2>Earth Disturbance Projects</h2>
-      <ol>
-        <li v-for="project in earthDisturbaceProjects">
-          <h3>{{ project.attributes.project_name }}</h3>
-          <br>
-          <br>
-        </li>
-      </ol>
+      <LandDevelopmentList></LandDevelopmentList>
+      <hr>
+      <h2>Earth Disturbance Projects</h2>
+      <EarthDisturbanceList></EarthDisturbanceList>
+      <hr>
       <h2>Capital Projects</h2>
-      <ol>
-        <li v-for="project in capitalProjects">
-          <h3>{{ project.attributes.project_name }}</h3>
-          {{ project.attributes.project_address }}
-          <br>
-          Narrative: {{ project.attributes.project_narrative }}
-          <br>
-          <br>
-          Updates: {{ project.attributes.public_project_updates }}
-          <br>
-          <br>
-        </li>
-      </ol> -->
+      <CapitalProjectsList></CapitalProjectsList>
     </div>
   </calcite-shell>
 
@@ -127,8 +86,22 @@ onMounted(async () => {
   }
 }
 
+
+li {
+  margin-bottom: 2rem;
+}
+
+ol li::marker {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 calcite-table {
   width: 50%;
+}
+
+calcite-shell {
+  height: fit-content;
 }
 
 #reportWrapper {
@@ -138,15 +111,26 @@ calcite-table {
 div[slot="user"] {
   display: flex;
   align-items: center;
+
+  & calcite-button {
+    padding-right: 1rem;
+  }
+
 }
 
-h1,h2,h3 {
+h2 {
   margin: 0px;
+}
+
+hr {
+  width: 80%;
+  margin-inline: auto;
+  margin-bottom: 1.25rem;
 }
 
   calcite-shell {
     margin-inline: auto;
-    max-width: 816px;
+    max-width: 800px;
   }
 
 </style>
