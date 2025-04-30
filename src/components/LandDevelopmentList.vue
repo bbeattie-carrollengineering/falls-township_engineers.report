@@ -14,7 +14,7 @@ const { landDevelopmentProjects } = storeToRefs(dataStore);
 <ol>
         <li v-for="project in landDevelopmentProjects">
           <p class="projectTitle"><span>{{ project.attributes.project_name }} </span> | {{ project.attributes.project_address ? project.attributes.project_address : "No Address Provided" }}</p>
-          <calcite-table striped="" scale="s" layout="fixed">
+          <calcite-table scale="s" layout="fixed">
             <calcite-table-row>
               <calcite-table-cell col-span="1" alignment="center"><b>JEA#:</b></calcite-table-cell>
               <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number ? project.attributes.JEA_number : "Not Provided" }}</calcite-table-cell>
@@ -39,12 +39,12 @@ const { landDevelopmentProjects } = storeToRefs(dataStore);
           <p class="projectNarrative">
             <span>Narrative:</span>
             <br>
-            {{ project.attributes.project_narrative }}
+            {{ project.attributes.project_narrative ? project.attributes.project_narrative : "Not Provided"}}
           </p>
           <p class="projectNarrative">
             <span>Updates:</span>
             <br>
-            {{ project.attributes.public_project_updates }}
+            {{ project.attributes.public_project_updates ? project.attributes.public_project_updates : "Not Provided" }}
           </p>
         </li>
       </ol>
