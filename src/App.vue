@@ -1,4 +1,7 @@
 <script setup>
+import { onMounted, ref} from "vue";
+import { storeToRefs } from "pinia";
+
 import "@esri/calcite-components/dist/components/calcite-shell";
 import "@esri/calcite-components/dist/components/calcite-navigation";
 import "@esri/calcite-components/dist/components/calcite-navigation-logo";
@@ -8,13 +11,8 @@ import "@esri/calcite-components/dist/components/calcite-table";
 import "@esri/calcite-components/dist/components/calcite-table-row";
 import "@esri/calcite-components/dist/components/calcite-table-cell";
 
-import Portal from "@arcgis/core/portal/Portal";
 import OAuthInfo from "@arcgis/core/identity/OAuthInfo";
 import IdentityManager from "@arcgis/core/identity/IdentityManager";
-import PortalQueryParams from "@arcgis/core/portal/PortalQueryParams";
-
-
-import { onMounted} from "vue";
 
 import { formatDateTimeUnix } from "@/composables/date.js"
 
@@ -25,18 +23,35 @@ import CapitalProjectsList from "./components/CapitalProjectsList.vue";
 import { useDataStore } from "@/stores/data";
 const { fetchCapitalProjects, fetchLandDevelopmentProjects, fetchEarthDisturbanceProjects } = useDataStore();
 
+const successfulLogin = ref(false)
+const info = new OAuthInfo({
+  appId: "wqLbRsh5jse6I5wu",
+  portalUrl: "https://fallstwp.maps.arcgis.com/"
+});
+
+IdentityManager.registerOAuthInfos([info]);
+
+
 
 onMounted(async () => {
-  try {
-    await Promise.all([
-      fetchCapitalProjects(),
-      fetchLandDevelopmentProjects(),
-      fetchEarthDisturbanceProjects()
-    ])
-  } catch (error) {
-    console.error(error);
-  }
-});
+
+    try {
+      const credential = await IdentityManager.checkSignInStatus(info.portalUrl + "/sharing");
+
+      if (credential) {
+        successfulLogin.value = true
+      }
+
+      await Promise.all([
+        fetchCapitalProjects(credential.token),
+        fetchLandDevelopmentProjects(credential.token),
+        fetchEarthDisturbanceProjects(credential.token)
+      ]);
+  
+    } catch (error) {
+      await IdentityManager.getCredential(info.portalUrl + "/sharing")
+    }
+  })
 
 
 function generatePDF () {
@@ -46,12 +61,12 @@ function generatePDF () {
 </script>
 
 <template>
-  <calcite-shell>
+  <calcite-shell v-if="successfulLogin">
     <calcite-navigation slot="header">
       <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report" description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
         <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>
-        <calcite-chip class="showOnPrint" icon="date-time">As of {{ formatDateTimeUnix(Date.now()) }}</calcite-chip>
+        <calcite-chip class="showOnPrint">As of {{ formatDateTimeUnix(Date.now()) }}</calcite-chip>
       </div>
       <calcite-navigation class="hideOnPrint" slot="navigation-secondary">
         <p slot="content-center"><i>As of {{ formatDateTimeUnix(Date.now()) }}</i></p>
