@@ -8,6 +8,12 @@ import "@esri/calcite-components/dist/components/calcite-table";
 import "@esri/calcite-components/dist/components/calcite-table-row";
 import "@esri/calcite-components/dist/components/calcite-table-cell";
 
+import Portal from "@arcgis/core/portal/Portal";
+import OAuthInfo from "@arcgis/core/identity/OAuthInfo";
+import IdentityManager from "@arcgis/core/identity/IdentityManager";
+import PortalQueryParams from "@arcgis/core/portal/PortalQueryParams";
+
+
 import { onMounted} from "vue";
 
 import { formatDateTimeUnix } from "@/composables/date.js"
@@ -44,9 +50,10 @@ function generatePDF () {
     <calcite-navigation slot="header">
       <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report" description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
-        <calcite-button @click="generatePDF" icon-start="download">Generate Report</calcite-button>
+        <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>
+        <calcite-chip class="showOnPrint" icon="date-time">As of {{ formatDateTimeUnix(Date.now()) }}</calcite-chip>
       </div>
-      <calcite-navigation slot="navigation-secondary">
+      <calcite-navigation class="hideOnPrint" slot="navigation-secondary">
         <p slot="content-center"><i>As of {{ formatDateTimeUnix(Date.now()) }}</i></p>
       </calcite-navigation>
     </calcite-navigation>
@@ -65,6 +72,20 @@ function generatePDF () {
 </template>
 
 <style>
+
+.showOnPrint {
+  display: none;
+}
+
+
+@media print {
+  .hideOnPrint {
+    display: none;
+  }
+  .showOnPrint {
+  display:contents;
+}
+}
 
 .projectTitle {
   font-size: 1rem;
@@ -98,6 +119,10 @@ ol li::marker {
 
 calcite-table {
   width: 50%;
+}
+
+calcite-table {
+  --calcite-color-border-3: white;
 }
 
 calcite-shell {

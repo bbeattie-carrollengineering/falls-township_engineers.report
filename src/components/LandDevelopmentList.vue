@@ -16,24 +16,24 @@ const { landDevelopmentProjects } = storeToRefs(dataStore);
           <p class="projectTitle"><span>{{ project.attributes.project_name }} </span> | {{ project.attributes.project_address ? project.attributes.project_address : "No Address Provided" }}</p>
           <calcite-table scale="s" layout="fixed">
             <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>JEA#:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.JEA_number ? project.attributes.JEA_number : "Not Provided" }}</calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left"><b>JEA#:</b></calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left">{{ project.attributes.JEA_number ? project.attributes.JEA_number : "Not Provided" }}</calcite-table-cell>
             </calcite-table-row>
             <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>Submitted:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.date_submitted ? formatDateUnix(project.attributes.date_submitted) : "Not Provided" }}</calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left"><b>Submitted:</b></calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left">{{ project.attributes.date_submitted ? formatDateUnix(project.attributes.date_submitted) : "Not Provided" }}</calcite-table-cell>
             </calcite-table-row>
             <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>PC Approval:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.pc_review_date ? formatDateUnix(project.attributes.pc_review_date) : "Not Provided" }}</calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left"><b>PC Approval:</b></calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left">{{ project.attributes.pc_review_date ? formatDateUnix(project.attributes.pc_review_date) : "Not Provided" }}</calcite-table-cell>
             </calcite-table-row>
             <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>BOS Approval:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.bos_review_date ? formatDateUnix(project.attributes.bos_review_date) : "Not Provided" }}</calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left"><b>BOS Approval:</b></calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left">{{ project.attributes.bos_review_date ? formatDateUnix(project.attributes.bos_review_date) : "Not Provided" }}</calcite-table-cell>
             </calcite-table-row>
             <calcite-table-row>
-              <calcite-table-cell col-span="1" alignment="center"><b>Start of Construction:</b></calcite-table-cell>
-              <calcite-table-cell col-span="1" alignment="center">{{ project.attributes.start_of_construction_date ? formatDateUnix(project.attributes.start_of_construction_date) : "Not Provided" }}</calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left"><b>Start of Construction:</b></calcite-table-cell>
+              <calcite-table-cell col-span="1" alignment="left">{{ project.attributes.start_of_construction_date ? formatDateUnix(project.attributes.start_of_construction_date) : "Not Provided" }}</calcite-table-cell>
             </calcite-table-row>
           </calcite-table>
           <p class="projectNarrative">
