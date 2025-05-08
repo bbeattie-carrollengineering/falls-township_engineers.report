@@ -6,6 +6,9 @@ import "@esri/calcite-components/dist/components/calcite-shell";
 import "@esri/calcite-components/dist/components/calcite-navigation";
 import "@esri/calcite-components/dist/components/calcite-navigation-logo";
 import "@esri/calcite-components/dist/components/calcite-button";
+import "@esri/calcite-components/dist/components/calcite-split-button";
+import "@esri/calcite-components/dist/components/calcite-dropdown-group";
+import "@esri/calcite-components/dist/components/calcite-dropdown-item";
 import "@esri/calcite-components/dist/components/calcite-chip";
 import "@esri/calcite-components/dist/components/calcite-table";
 import "@esri/calcite-components/dist/components/calcite-table-row";
@@ -63,8 +66,16 @@ function generatePDF () {
 <template>
   <calcite-shell v-if="successfulLogin">
     <calcite-navigation slot="header">
-      <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report" description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
+      <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report"
+        description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
+        <calcite-dropdown width="m">
+          <calcite-button slot="trigger" appearance="outline" icon-start="table" icon-end="chevron-down" class="export-green">Export Data</calcite-button>
+          <calcite-dropdown-group group-title="Files" class="export-green" selection-mode="none">
+            <calcite-dropdown-item icon-start="file-excel">Land Development & Permit Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel">Capital Project & Road Records.xlsx</calcite-dropdown-item>
+          </calcite-dropdown-group>
+        </calcite-dropdown>
         <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>
         <calcite-chip class="showOnPrint">As of {{ formatDateTimeUnix(Date.now()) }}</calcite-chip>
       </div>
@@ -87,6 +98,10 @@ function generatePDF () {
 </template>
 
 <style>
+:root {
+  --excel-green: #008000
+}
+
 
 .showOnPrint {
   display: none;
@@ -100,6 +115,13 @@ function generatePDF () {
   .showOnPrint {
   display:contents;
 }
+}
+
+.export-green {
+  --calcite-color-brand: var(--excel-green);
+  --calcite-color-brand-press: var(--excel-green);
+  --calcite-color-brand-hover: var(--excel-green);
+  --calcite-color-focus: var(--excel-green);
 }
 
 .projectTitle {
