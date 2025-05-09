@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref} from "vue";
-import { storeToRefs } from "pinia";
 
 import "@esri/calcite-components/dist/components/calcite-shell";
 import "@esri/calcite-components/dist/components/calcite-navigation";
@@ -18,6 +17,7 @@ import OAuthInfo from "@arcgis/core/identity/OAuthInfo";
 import IdentityManager from "@arcgis/core/identity/IdentityManager";
 
 import { formatDateTimeUnix } from "@/composables/date.js"
+import { exportItem, downloadItem, isDownloading } from "./composables/export";
 
 import LandDevelopmentList from "./components/LandDevelopmentList.vue";
 import EarthDisturbanceList from "./components/EarthDisturbanceList.vue";
@@ -34,23 +34,20 @@ const info = new OAuthInfo({
 
 IdentityManager.registerOAuthInfos([info]);
 
+let credential;
 
 
 onMounted(async () => {
-
     try {
-      const credential = await IdentityManager.checkSignInStatus(info.portalUrl + "/sharing");
-
+      credential = await IdentityManager.checkSignInStatus(info.portalUrl + "/sharing");
       if (credential) {
         successfulLogin.value = true
       }
-
       await Promise.all([
         fetchCapitalProjects(credential.token),
         fetchLandDevelopmentProjects(credential.token),
         fetchEarthDisturbanceProjects(credential.token)
       ]);
-  
     } catch (error) {
       await IdentityManager.getCredential(info.portalUrl + "/sharing")
     }
@@ -59,6 +56,27 @@ onMounted(async () => {
 
 function generatePDF () {
   window.print()
+}
+
+
+async function exportHandler({target}) {
+
+  let itemID;
+  let excelFileID;
+
+  isDownloading.value = true
+
+  if (target.textContent === "Land Development & Permit Records.xlsx") {
+    itemID = "56609ef326e7464fa61ba17e08739529"
+    excelFileID = await exportItem(itemID, credential.token)
+    downloadItem(excelFileID, credential.token)
+  }
+  if (target.textContent === "Capital Project & Road Records.xlsx") {
+    itemID = "886e4d0686d94855b89e5952f71337a4"
+    exportItem(itemID, credential.token)
+    excelFileID = await exportItem(itemID, credential.token)
+    downloadItem(excelFileID, credential.token)
+  }
 }
 
 </script>
@@ -70,10 +88,10 @@ function generatePDF () {
         description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
         <calcite-dropdown width="m">
-          <calcite-button slot="trigger" appearance="outline" icon-start="table" icon-end="chevron-down" class="export-green">Export Data</calcite-button>
+          <calcite-button :loading="isDownloading" slot="trigger" appearance="outline" icon-start="table" icon-end="chevron-down" class="export-green">Export Data</calcite-button>
           <calcite-dropdown-group group-title="Files" class="export-green" selection-mode="none">
-            <calcite-dropdown-item icon-start="file-excel">Land Development & Permit Records.xlsx</calcite-dropdown-item>
-            <calcite-dropdown-item icon-start="file-excel">Capital Project & Road Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportHandler">Land Development & Permit Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportHandler" >Capital Project & Road Records.xlsx</calcite-dropdown-item>
           </calcite-dropdown-group>
         </calcite-dropdown>
         <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>
