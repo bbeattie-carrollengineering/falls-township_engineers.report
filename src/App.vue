@@ -17,7 +17,7 @@ import OAuthInfo from "@arcgis/core/identity/OAuthInfo";
 import IdentityManager from "@arcgis/core/identity/IdentityManager";
 
 import { formatDateTimeUnix } from "@/composables/date.js"
-import { exportItem, downloadItem, isDownloading } from "./composables/export";
+import { triggerItemExport, isDownloading, checkJobStatus, intervalPollingID } from "./composables/export";
 
 import LandDevelopmentList from "./components/LandDevelopmentList.vue";
 import EarthDisturbanceList from "./components/EarthDisturbanceList.vue";
@@ -36,14 +36,15 @@ IdentityManager.registerOAuthInfos([info]);
 
 let credential;
 
-
 onMounted(async () => {
     try {
       credential = await IdentityManager.checkSignInStatus(info.portalUrl + "/sharing");
+
       if (credential) {
         successfulLogin.value = true
       }
-      await Promise.all([
+
+      Promise.all([
         fetchCapitalProjects(credential.token),
         fetchLandDevelopmentProjects(credential.token),
         fetchEarthDisturbanceProjects(credential.token)
@@ -59,23 +60,22 @@ function generatePDF () {
 }
 
 
-async function exportHandler({target}) {
+async function exportManager({target}) {
 
   let itemID;
-  let excelFileID;
+  let exportResponseObject;
 
   isDownloading.value = true
 
   if (target.textContent === "Land Development & Permit Records.xlsx") {
     itemID = "56609ef326e7464fa61ba17e08739529"
-    excelFileID = await exportItem(itemID, credential.token)
-    downloadItem(excelFileID, credential.token)
+    exportResponseObject = await triggerItemExport(itemID, credential.userId, credential.token)
+    intervalPollingID.value = setInterval(() => {checkJobStatus(exportResponseObject, credential.userId, credential.token)}, 1500)
   }
   if (target.textContent === "Capital Project & Road Records.xlsx") {
     itemID = "886e4d0686d94855b89e5952f71337a4"
-    exportItem(itemID, credential.token)
-    excelFileID = await exportItem(itemID, credential.token)
-    downloadItem(excelFileID, credential.token)
+    exportResponseObject = await triggerItemExport(itemID, credential.userId, credential.token)
+    intervalPollingID.value = setInterval(() => {checkJobStatus(exportResponseObject, credential.userId, credential.token)}, 1500)
   }
 }
 
@@ -87,11 +87,11 @@ async function exportHandler({target}) {
       <calcite-navigation-logo slot="logo" icon="file-report-generic" heading="Engineer's Report"
         description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
-        <calcite-dropdown width="m">
+        <calcite-dropdown class="hideOnPrint" width="m">
           <calcite-button :loading="isDownloading" slot="trigger" appearance="outline" icon-start="table" icon-end="chevron-down" class="export-green">Export Data</calcite-button>
           <calcite-dropdown-group group-title="Files" class="export-green" selection-mode="none">
-            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportHandler">Land Development & Permit Records.xlsx</calcite-dropdown-item>
-            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportHandler" >Capital Project & Road Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager">Land Development & Permit Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager" >Capital Project & Road Records.xlsx</calcite-dropdown-item>
           </calcite-dropdown-group>
         </calcite-dropdown>
         <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>
