@@ -5,8 +5,8 @@ import "@esri/calcite-components/dist/components/calcite-shell";
 import "@esri/calcite-components/dist/components/calcite-navigation";
 import "@esri/calcite-components/dist/components/calcite-navigation-logo";
 import "@esri/calcite-components/dist/components/calcite-button";
-import "@esri/calcite-components/dist/components/calcite-split-button";
 import "@esri/calcite-components/dist/components/calcite-dropdown-group";
+import "@esri/calcite-components/dist/components/calcite-dropdown";
 import "@esri/calcite-components/dist/components/calcite-dropdown-item";
 import "@esri/calcite-components/dist/components/calcite-chip";
 import "@esri/calcite-components/dist/components/calcite-table";
@@ -26,6 +26,8 @@ import CapitalProjectsList from "./components/CapitalProjectsList.vue";
 import { useDataStore } from "@/stores/data";
 const { fetchCapitalProjects, fetchLandDevelopmentProjects, fetchEarthDisturbanceProjects } = useDataStore();
 
+// START OAUTH SECTION ----------------
+
 const successfulLogin = ref(false)
 const info = new OAuthInfo({
   appId: "wqLbRsh5jse6I5wu",
@@ -35,6 +37,11 @@ const info = new OAuthInfo({
 IdentityManager.registerOAuthInfos([info]);
 
 let credential;
+
+// END OAUTH SECTION ----------------
+
+
+// START DATA FETCH SECTION ----------------
 
 onMounted(async () => {
     try {
@@ -54,6 +61,7 @@ onMounted(async () => {
     }
   })
 
+  // END DATA FETCH SECTION ----------------
 
 function generatePDF () {
   window.print()
@@ -88,10 +96,13 @@ async function exportManager({target}) {
         description="Township of Falls | Bucks County, PA"></calcite-navigation-logo>
       <div slot="user">
         <calcite-dropdown class="hideOnPrint" width="m">
-          <calcite-button :loading="isDownloading" slot="trigger" appearance="outline" icon-start="table" icon-end="chevron-down" class="export-green">Export Data</calcite-button>
+          <calcite-button :loading="isDownloading" slot="trigger" appearance="outline" icon-start="table"
+            icon-end="chevron-down" class="export-green">Export Data</calcite-button>
           <calcite-dropdown-group group-title="Files" class="export-green" selection-mode="none">
-            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager">Land Development & Permit Records.xlsx</calcite-dropdown-item>
-            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager" >Capital Project & Road Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager">Land Development &
+              Permit Records.xlsx</calcite-dropdown-item>
+            <calcite-dropdown-item icon-start="file-excel" @calciteDropdownItemSelect="exportManager">Capital Project &
+              Road Records.xlsx</calcite-dropdown-item>
           </calcite-dropdown-group>
         </calcite-dropdown>
         <calcite-button class="hideOnPrint" @click="generatePDF" icon-start="download">Generate Report</calcite-button>

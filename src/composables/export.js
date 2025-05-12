@@ -81,7 +81,6 @@ async function checkJobStatus(exportResponse, username, token) {
     const jobResponseJSON = await jobResponse.json()
 
     if (jobResponseJSON.status === "completed") {
-      console.log("completed")
       downloadItem(exportResponse, username, token)
       clearInterval(intervalPollingID.value)
       jobCompletionHandled = true
